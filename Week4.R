@@ -1,7 +1,7 @@
 airlines <- read.csv(file = "data202/airlines.csv")
-
+head(airlines)
 # exact Matching of strings
-airlines[airlines$Country == "New Zealand"]
+airlines[airlines$Country == "New Zealand", ]
 
 # Match substrings
 c <- "New Zealand"
@@ -43,4 +43,24 @@ grepl("royal", tolower(airlines$Airline))
 roy2 <- airlines[grepl("royal", airlines$Airline, ignore.case = TRUE), ]
 dim(roy2)
 roy2$Airline
+
+# cat(): print without any annotation
+cat("The area of "); 
+
+# ======================================
+## built in functions
+dd <- Sys.Date()
+class(dd)
+as.numeric(dd)
+
+Sys.time()
+# get day / time / timezone
+
+
+
+
+
+
+
+
 
