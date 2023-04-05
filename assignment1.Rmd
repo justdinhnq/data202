@@ -1,0 +1,321 @@
+---
+title: "Assignment 1"
+author: "Nguyen Quoc Dinh, 300550781"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Question 1**
+Classify the following variables as categorical or numerical and further classify as logical, nominal, ordinal, binary, continuous or discrete. ALSO give the R class AND the R type that corresponds to each.
+
+Answer: 
+
+a. Air temperature: numerical/continuous
+
+b. Length of time spent looking for work: numerical/continuous
+ 
+c. Success in winning an election: categorical/logical
+
+d. Response to the question How often do you avoid news stories about climate change? (scale 1-6, 1=never, 2=rarely, …, 6=always): categorical/ordinal
+
+e. Number of attempts at a goal before scoring: numerical/integer
+
+
+**Question 2**
+
+Answer: 
+
+a. Display the values of a and z.
+
+```{r}
+a<- c(3,4,1)
+print(a)
+z<- array(c(-1,1,7,0,6,1), dim= c(3,2))
+print(z)
+```
+b. Write R code that will show the maximum value of a
+
+```{r}
+max(a)
+```
+c. Make a 3×2 array which has two copies of the vector a side by side, and store it as the object d. Print out the value of d.
+
+```{r}
+d<-array(
+  rep(a,times=2),  # 2 copies
+  dim=c(3,2)       # a 3x2 array
+)
+d
+```
+
+d. Write R code to print out the elements of a that are larger than the corresponding elements of the second column of z.
+
+```{r}
+a[a>z[,2]]
+```
+
+e. Print the sum of the product of z and d.
+
+```{r}
+sum(prod(z),prod(d))
+```
+
+f. Explain why the product of a and z - which have differing dimensions - is the same as the product of d and z.
+
+```{r}
+a*z
+
+d*z
+```
+Explanation: the product of two vectors (differt dimensions and/or different shape) follow the rule that the shorter vector is recycled to match the dimension and shape of the longer one.
+
+**Question 3**
+
+a. Give the code of your function
+
+```{r}
+convert.temperature<- function(x, from = "F"){
+  # more entrance condition
+  if(is.numeric(x) == FALSE){
+    stop("Temperature must be numeric")
+  }
+  
+  if(from=="F"){
+    return ((x-32)*5/9)
+  }else if(from=="C"){
+    return ((x*9/5)+32)
+  }
+  else{
+    stop("Invalid input specification")
+  }
+}
+```
+
+b. Demonstrate your function with the tests convert.temperature(20) and convert.temperature(20, from="C")
+```{r}
+# testing
+convert.temperature(20)
+
+convert.temperature(20,"C")
+```
+
+c. Confirm that the function works on vectors by evaluating the Fahrenheit temperature on the vector of temperatures 0:100 Celcius.
+
+```{r}
+convert.temperature(0:100, "C")
+```
+
+d. The coldest physical temperature is -273.15 Celcius. What is this on the Fahrenheit scale?
+
+```{r}
+convert.temperature(-273.15,"C")
+```
+
+e. Modify your function so that it returns NA for any temperature below -273.15 Celcius, printing a warning as it does so. Give the R code of the modified function
+
+```{r}
+convert.temperature<- function(x, from = "F"){
+  if(!is.numeric(x)){
+    stop("Temperature must be numeric")
+  } 
+  if(from != "C" & from != "F"){
+    stop("Invalid input specification")
+  }
+  
+  result <- c()
+  n <- length(x)
+  
+  for(i in 1:n){
+    result[i]<- NA
+    if(from == "C") {
+      if(x[i] < -273.15)
+        next  
+      else {
+        result[i]<-x[i]*(9/5)+32
+      }
+    } else {
+      result[i]<- (x[i]-32)*(5/9)
+      if(result[i]< -273.15)
+        next
+    }
+  }
+
+  
+  
+  if (any(is.na(result))){
+        warning("Please change the value. It must not be below -273.15 Celcius") 
+  }
+  return(result)
+}  
+```
+
+f. Test your modified function on the vector of Celcius temperatures c(100,0,-100,-200,-300) to see that it has the correct behaviour.
+
+```{r}
+convert.temperature(c(100,0,-100,-200,-300),"C")
+```
+
+**Question 4**
+
+a. Write R code to read the file starsearch.csv into an object called star. Note that when reading the file you will need to skip the first two lines of the file (find out how to skip lines by consulting the appropriate help file in R)
+
+```{r}
+star<- read.csv("starsearch.csv", skip=2)
+head(star)
+```
+
+b and c. Write R code to determine the number of rows and columns of star
+
+```{r}
+paste("The number of rows of star is :", nrow(star))
+
+paste("The number of columns of star is :", ncol(star))
+```
+
+d. Convert the first column of star into date format. It only has year and month specified (e.g. 2004-01 for January 2004), and to convert to a date we need to tell it which day of the month. We’ll assume each date is the first of the relevant month: which means we want to change 2004-01 to 2004-01-01. Append -01 to each entry in the Month column using the paste() function, and then you can make the date conversion on the result.
+
+```{r}
+star$Month<-paste(star$Month,sep="", "-01" )
+
+star$Month<-as.Date(star$Month,format=("%Y-%m-%d"))
+
+head(star)
+```
+
+e. Draw a line graph of the “star wars” searches over time. Label the axes of the graph and give it a suitable title.
+
+```{r}
+plot(
+  x = star[,1], 
+  y = star[,2],
+  type="line", 
+  xlab = "Year", 
+  ylab = "# searches", 
+  main = "star wars searches over time"
+)
+```
+
+e. For zero marks, identify the major peaks on the graph.
+
+Answer: the two major peaks of the graph are 2006 and 2016
+
+g. Use R to identify the (very few) months where there were more ‘star trek’ searches than ‘star wars’ searches.
+
+```{r}
+months <- star$Month[star[,3] > star[,2]]
+
+print("Months where there were more ‘star trek’ searches than ‘star wars’ searches: ")
+
+print(format(months,format = "%B - %Y"))
+```
+
+**Question 5**
+Assuming x and y are vectors of length 3, explain the difference between the actions of the following four statements
+
+x = y : assign x with y's values, vice versa. They are pointing to the same location on memory.
+
+x == y : compare x and y (TRUE/FALSE) 
+
+x <- y : assign the values of y to x and changing x will not affect y.
+
+x < (-y) : compare x whether less than (-y)
+
+**Question 6**
+
+a. Draw a histogram of student heights
+
+```{r}
+library(MASS)
+
+head(survey)
+
+hist(
+  survey$Height,
+  xlab = "Student heights (cm)", 
+  ylab = "# students", 
+  main = "Student heights")
+```
+
+b. Draw side by side boxplots of heights - one for each of the different ways the students fold their arms. Make the fill colour of the boxes dark red.
+
+```{r}
+boxplot(
+  split(survey$Height,survey$Fold), 
+  xlab = "The ways students fold their arms", 
+  ylab = "Student heights (cm)", 
+  main = "Student heights vs. the ways students fold their arms", 
+  col = "darkred" )
+```
+
+c. Draw a scatterplot of pulse rate (on the vertical axis) against student height (on the horizontal axis)
+
+```{r}
+plot(
+  survey$Height, 
+  survey$Pulse, 
+  xlab = "Student heights (cm)", 
+  ylab = "pulse rate (bpm)", 
+  main = "pulse rate vs. student height"
+)
+```
+
+d. Draw side by side barplots of the counts of people categorised by how much they exercise and whether they smoke.
+
+```{r}
+survey$Exer <- factor(
+  survey$Exer, 
+  levels = c("None","Some","Freq"), 
+  labels = c("No exercise","Some exercise","Frequent exercise")
+  )
+survey$Smoke <- factor(
+  survey$Smoke, 
+  levels = c("Heavy", "Regul","Occas", "Never"), 
+  labels = c("Heavy","Regular","Occasional","Never")
+  )
+
+
+barplot(
+  table(survey$Smoke,survey$Exer), 
+  beside = TRUE, 
+  xlab = "how much they exercise ", 
+  ylab = "How much they smoke",
+  main = "How much students exercise vs. smoke", 
+  legend=TRUE,
+  col=c("blue","yellow","lightgreen")
+)
+```
+
+**Question 7**
+
+a.Use R to find out what day of the week it was when ChatGPT was first released.
+
+```{r}
+#ChatGPT was initially released on November 30, 2022.
+gpt_release <- as.Date("November 30, 2022", format = "%B %d, %Y")
+
+paste("The day of the week it was when ChatGPT was first released: ", weekdays(gpt_release))
+```
+
+b. What date and time (to the nearest hour) was it in New York when the Titanic set sail from Southampton in 1912? Give R code to make this calculation between time zones.
+
+```{r}
+# The Titanic set sail from Southampton on April 10, 1912 at 12:00 pm local time.
+Titanic_Southampton <- as.POSIXct("April 10, 1912 at 12", format ="%B %d, %Y at %H", tz = "Europe/London")
+
+Titanic_NewYork<- format(
+  Titanic_Southampton, 
+  format ="%H:%M %B %d in %Y", 
+  tz = "US/Eastern"
+)
+
+paste(
+  "When the Titanic set sail from Southampton in 1912 at 12:00 pm local time, in New York was", 
+  Titanic_NewYork
+)
+```
+
+
